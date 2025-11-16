@@ -17,10 +17,10 @@ RUN useradd -m -u 1000 stable
 WORKDIR /home/stable
 
 # Download and install Stable node binary
-RUN wget https://stable-testnet-data.s3.us-east-1.amazonaws.com/stabled-latest-linux-amd64-testnet.tar.gz && \
-    tar -xvzf stabled-latest-linux-amd64-testnet.tar.gz && \
+RUN wget https://stable-testnet-data.s3.us-east-1.amazonaws.com/stabled-1.1.1-linux-amd64-testnet.tar.gz && \
+    tar -xzf stabled-1.1.1-linux-amd64-testnet.tar.gz && \
     mv stabled /usr/bin/ && \
-    rm stabled-latest-linux-amd64-testnet.tar.gz
+    rm stabled-1.1.1-linux-amd64-testnet.tar.gz
 
 # Switch to stable user
 USER stable

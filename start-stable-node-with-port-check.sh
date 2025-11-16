@@ -143,6 +143,11 @@ sed -i 's/^pex = false/pex = true/' ~/.stabled/config/config.toml
 sed -i 's/^laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26657"/' ~/.stabled/config/config.toml
 sed -i 's/^cors_allowed_origins = \[\]/cors_allowed_origins = \["\*"\]/' ~/.stabled/config/config.toml
 
+# Fix permissions for the stabled directory
+echo "[~] Fixing permissions..." >&2
+chown -R 1000:1000 ~/.stabled
+chmod -R 755 ~/.stabled
+
 # Download and extract snapshot if snapshot file doesn't exist in project directory
 if [ ! -f "/root/stable-node/snapshot.tar.lz4" ]; then
     echo "[~] Downloading snapshot..." >&2
@@ -163,11 +168,6 @@ pv snapshot.tar.lz4 | tar -I lz4 -xf - -C ~/.stabled/ || tar -I lz4 -xvf snapsho
 
 # Clean up snapshot file
 rm snapshot.tar.lz4
-
-# Fix permissions for the stabled directory
-echo "[~] Fixing permissions..." >&2
-chown -R 1000:1000 ~/.stabled
-chmod -R 755 ~/.stabled
 
 # Update docker-compose.yml with the available ports
 echo "[~] Updating docker-compose.yml with available ports..." >&2
