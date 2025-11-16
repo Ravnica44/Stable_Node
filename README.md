@@ -73,6 +73,21 @@ To see the latest block processed by your node:
 docker compose exec stable-node curl -s localhost:26657/status | jq '.result.sync_info.latest_block_height'
 ```
 
+### Monitor Synchronization Progress
+
+To continuously monitor the synchronization progress, use the monitoring script:
+```bash
+chmod +x monitor-sync.sh
+./monitor-sync.sh
+```
+
+This script will display real-time synchronization information every 10 seconds:
+- Current block height
+- Synchronization status
+- Latest block timestamp
+
+Press `Ctrl+C` to stop the monitoring.
+
 ## General Monitoring
 
 To view the node logs:
