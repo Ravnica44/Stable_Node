@@ -1,0 +1,8 @@
+# Stable node data directory
+stabled/
+
+# Snapshot file
+snapshot.tar.lz4
+
+# Port information file
+ports.info

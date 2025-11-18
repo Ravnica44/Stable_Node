@@ -12,7 +12,7 @@ services:
       - "26660:8546"
       - "26661:9090"
     volumes:
-      - ~/.stabled:/home/stable/.stabled
+      - ./stabled:/home/stable/.stabled
     environment:
       - MONIKER=docker-node
       - CHAIN_ID=stabletestnet_2201-1

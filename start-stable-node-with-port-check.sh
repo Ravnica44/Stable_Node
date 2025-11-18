@@ -102,51 +102,54 @@ apt install -y wget curl jq lz4 unzip pv >/dev/null 2>&1
 export MONIKER="docker-node"
 export CHAIN_ID="stabletestnet_2201-1"
 
+# Define STABLED_DIR path inside stable-node directory
+STABLED_DIR="/root/stable-node/.stabled"
+
 # Initialize node
 echo "[~] Initializing node..." >&2
-mkdir -p ~/.stabled
+mkdir -p $STABLED_DIR
 stabled init $MONIKER --chain-id $CHAIN_ID >/dev/null 2>&1
 
 # Download and configure genesis
 echo "[~] Configuring genesis..." >&2
-mv ~/.stabled/config/genesis.json ~/.stabled/config/genesis.json.backup
+mv $STABLED_DIR/config/genesis.json $STABLED_DIR/config/genesis.json.backup
 wget https://stable-testnet-data.s3.us-east-1.amazonaws.com/stable_testnet_genesis.zip >/dev/null 2>&1
 unzip stable_testnet_genesis.zip >/dev/null 2>&1
-cp genesis.json ~/.stabled/config/genesis.json
+cp genesis.json $STABLED_DIR/config/genesis.json
 rm stable_testnet_genesis.zip genesis.json
 
 # Download and configure optimized settings
 echo "[~] Configuring optimized settings..." >&2
 wget https://stable-testnet-data.s3.us-east-1.amazonaws.com/rpc_node_config.zip >/dev/null 2>&1
 unzip rpc_node_config.zip >/dev/null 2>&1
-cp ~/.stabled/config/config.toml ~/.stabled/config/config.toml.backup
-cp ~/.stabled/config/app.toml ~/.stabled/config/app.toml.backup
-cp config.toml ~/.stabled/config/config.toml
-cp app.toml ~/.stabled/config/app.toml
-sed -i "s/^moniker = \".*\"/moniker = \"$MONIKER\"/" ~/.stabled/config/config.toml
+cp $STABLED_DIR/config/config.toml $STABLED_DIR/config/config.toml.backup
+cp $STABLED_DIR/config/app.toml $STABLED_DIR/config/app.toml.backup
+cp config.toml $STABLED_DIR/config/config.toml
+cp app.toml $STABLED_DIR/config/app.toml
+sed -i "s/^moniker = \".*\"/moniker = \"$MONIKER\"/" $STABLED_DIR/config/config.toml
 rm rpc_node_config.zip config.toml app.toml
 
 # Essential configuration updates
 echo "[~] Updating configuration files..." >&2
 
 # Enable JSON-RPC in app.toml
-sed -i '/\[json-rpc\]/,/^\[.*\]/ s/enable = false/enable = true/' ~/.stabled/config/app.toml
-sed -i '/\[json-rpc\]/,/^\[.*\]/ s/address = "127.0.0.1:8545"/address = "0.0.0.0:8545"/' ~/.stabled/config/app.toml
-sed -i '/\[json-rpc\]/,/^\[.*\]/ s/ws-address = "127.0.0.1:8546"/ws-address = "0.0.0.0:8546"/' ~/.stabled/config/app.toml
+sed -i '/\[json-rpc\]/,/^\[.*\]/ s/enable = false/enable = true/' $STABLED_DIR/config/app.toml
+sed -i '/\[json-rpc\]/,/^\[.*\]/ s/address = "127.0.0.1:8545"/address = "0.0.0.0:8545"/' $STABLED_DIR/config/app.toml
+sed -i '/\[json-rpc\]/,/^\[.*\]/ s/ws-address = "127.0.0.1:8546"/ws-address = "0.0.0.0:8546"/' $STABLED_DIR/config/app.toml
 
 # Configure P2P in config.toml
-sed -i 's/^laddr = "tcp:\/\/127.0.0.1:26656"/laddr = "tcp:\/\/0.0.0.0:26656"/' ~/.stabled/config/config.toml
-sed -i 's/^persistent_peers = ""/persistent_peers = "5ed0f977a26ccf290e184e364fb04e268ef16430@37.187.147.27:26656,128accd3e8ee379bfdf54560c21345451c7048c7@37.187.147.22:26656"/' ~/.stabled/config/config.toml
-sed -i 's/^pex = false/pex = true/' ~/.stabled/config/config.toml
+sed -i 's/^laddr = "tcp:\/\/127.0.0.1:26656"/laddr = "tcp:\/\/0.0.0.0:26656"/' $STABLED_DIR/config/config.toml
+sed -i 's/^persistent_peers = ""/persistent_peers = "5ed0f977a26ccf290e184e364fb04e268ef16430@37.187.147.27:26656,128accd3e8ee379bfdf54560c21345451c7048c7@37.187.147.22:26656"/' $STABLED_DIR/config/config.toml
+sed -i 's/^pex = false/pex = true/' $STABLED_DIR/config/config.toml
 
 # Configure RPC in config.toml
-sed -i 's/^laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26657"/' ~/.stabled/config/config.toml
-sed -i 's/^cors_allowed_origins = \[\]/cors_allowed_origins = \["\*"\]/' ~/.stabled/config/config.toml
+sed -i 's/^laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26657"/' $STABLED_DIR/config/config.toml
+sed -i 's/^cors_allowed_origins = \[\]/cors_allowed_origins = \["\*"\]/' $STABLED_DIR/config/config.toml
 
 # Fix permissions for the stabled directory
 echo "[~] Fixing permissions..." >&2
-chown -R 1000:1000 ~/.stabled
-chmod -R 755 ~/.stabled
+chown -R 1000:1000 $STABLED_DIR
+chmod -R 755 $STABLED_DIR
 
 # Download and extract snapshot if snapshot file doesn't exist in project directory
 if [ ! -f "/root/stable-node/snapshot.tar.lz4" ]; then
@@ -160,11 +163,11 @@ fi
 
 # Remove old data
 echo "[~] Removing old data..." >&2
-rm -rf ~/.stabled/data/*
+rm -rf $STABLED_DIR/data/*
 
 # Extract snapshot
 echo "[~] Extracting snapshot..." >&2
-pv snapshot.tar.lz4 | tar -I lz4 -xf - -C ~/.stabled/ || tar -I lz4 -xvf snapshot.tar.lz4 -C ~/.stabled/
+pv snapshot.tar.lz4 | tar -I lz4 -xf - -C $STABLED_DIR/ || tar -I lz4 -xvf snapshot.tar.lz4 -C $STABLED_DIR/
 
 # Clean up snapshot file
 rm snapshot.tar.lz4
@@ -186,7 +189,7 @@ services:
       - "$WS_PORT:8546"
       - "$GRPC_PORT:9090"
     volumes:
-      - ~/.stabled:/home/stable/.stabled
+      - ./stabled:/home/stable/.stabled
     environment:
       - MONIKER=docker-node
       - CHAIN_ID=stabletestnet_2201-1
