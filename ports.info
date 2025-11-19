@@ -1,6 +1,0 @@
-P2P Port: 26656
-RPC Port: 26657
-API Port: 26658
-JSON-RPC Port: 26659
-WebSocket Port: 26660
-gRPC Port: 26661

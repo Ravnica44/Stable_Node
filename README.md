@@ -19,12 +19,12 @@ This repository contains all the necessary files to run a Stable node using Dock
 
 1. Make the startup script executable:
    ```bash
-   chmod +x start-stable-node-with-port-check.sh
+   chmod +x setup.sh
    ```
 
 2. Run the startup script:
    ```bash
-   ./start-stable-node-with-port-check.sh
+   ./setup.sh
    ```
 
 The script will automatically:
@@ -32,6 +32,20 @@ The script will automatically:
 - Download and configure the node
 - Download and extract the latest snapshot
 - Start the Docker container with proper port mapping
+
+## Exporting Your Private Key
+
+To export your validator private key for backup or wallet import:
+
+```bash
+# Export the private key (this will display it in JSON format)
+cat stabled/config/priv_validator_key.json
+
+# You can also save it to a file for backup
+cat stabled/config/priv_validator_key.json > validator-key-backup.json
+```
+
+**Important**: Keep your private key secure and never share it. Anyone with access to this key can control your validator.
 
 ## Services and Ports
 
@@ -78,7 +92,6 @@ docker compose exec stable-node curl -s localhost:26657/status | jq '.result.syn
 To continuously monitor the synchronization progress, use the monitoring script:
 ```bash
 chmod +x monitor-sync.sh
-./monitor-sync.sh
 ```
 
 This script will display real-time synchronization information every 10 seconds:
@@ -102,7 +115,7 @@ docker compose ps
 
 ## Configuration Files
 
-The node configuration files are stored in `~/.stabled/`:
+The node configuration files are stored in `stabled/`:
 - `config.toml`: Core Tendermint/CometBFT configuration
 - `app.toml`: Application-specific configuration
 - `genesis.json`: Genesis file
@@ -119,7 +132,7 @@ docker compose down
 To completely remove all node data:
 ```bash
 docker compose down -v
-rm -rf ~/.stabled
+rm -rf stabled
 ```
 
 ## Troubleshooting

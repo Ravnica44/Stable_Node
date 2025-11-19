@@ -103,33 +103,38 @@ export MONIKER="docker-node"
 export CHAIN_ID="stabletestnet_2201-1"
 
 # Define STABLED_DIR path inside stable-node directory
-STABLED_DIR="/root/stable-node/.stabled"
+STABLED_DIR="/root/stable-node/stabled"
 
-# Initialize node
-echo "[~] Initializing node..." >&2
-mkdir -p $STABLED_DIR
-stabled init $MONIKER --chain-id $CHAIN_ID >/dev/null 2>&1
+# Check if config directory exists
+if [ ! -d "$STABLED_DIR/config" ]; then
+    # Initialize node only if config doesn't exist
+    echo "[~] Initializing node..." >&2
+    mkdir -p $STABLED_DIR
+    stabled init $MONIKER --chain-id $CHAIN_ID >/dev/null 2>&1
+    
+    # Download and configure genesis
+    echo "[~] Configuring genesis..." >&2
+    mv $STABLED_DIR/config/genesis.json $STABLED_DIR/config/genesis.json.backup
+    wget https://stable-testnet-data.s3.us-east-1.amazonaws.com/stable_testnet_genesis.zip >/dev/null 2>&1
+    unzip stable_testnet_genesis.zip >/dev/null 2>&1
+    cp genesis.json $STABLED_DIR/config/genesis.json
+    rm stable_testnet_genesis.zip genesis.json
+    
+    # Download and configure optimized settings
+    echo "[~] Configuring optimized settings..." >&2
+    wget https://stable-testnet-data.s3.us-east-1.amazonaws.com/rpc_node_config.zip >/dev/null 2>&1
+    unzip rpc_node_config.zip >/dev/null 2>&1
+    cp $STABLED_DIR/config/config.toml $STABLED_DIR/config/config.toml.backup
+    cp $STABLED_DIR/config/app.toml $STABLED_DIR/config/app.toml.backup
+    cp config.toml $STABLED_DIR/config/config.toml
+    cp app.toml $STABLED_DIR/config/app.toml
+    sed -i "s/^moniker = \".*\"/moniker = \"$MONIKER\"/" $STABLED_DIR/config/config.toml
+    rm rpc_node_config.zip config.toml app.toml
+else
+    echo "[~] Using existing configuration..." >&2
+fi
 
-# Download and configure genesis
-echo "[~] Configuring genesis..." >&2
-mv $STABLED_DIR/config/genesis.json $STABLED_DIR/config/genesis.json.backup
-wget https://stable-testnet-data.s3.us-east-1.amazonaws.com/stable_testnet_genesis.zip >/dev/null 2>&1
-unzip stable_testnet_genesis.zip >/dev/null 2>&1
-cp genesis.json $STABLED_DIR/config/genesis.json
-rm stable_testnet_genesis.zip genesis.json
-
-# Download and configure optimized settings
-echo "[~] Configuring optimized settings..." >&2
-wget https://stable-testnet-data.s3.us-east-1.amazonaws.com/rpc_node_config.zip >/dev/null 2>&1
-unzip rpc_node_config.zip >/dev/null 2>&1
-cp $STABLED_DIR/config/config.toml $STABLED_DIR/config/config.toml.backup
-cp $STABLED_DIR/config/app.toml $STABLED_DIR/config/app.toml.backup
-cp config.toml $STABLED_DIR/config/config.toml
-cp app.toml $STABLED_DIR/config/app.toml
-sed -i "s/^moniker = \".*\"/moniker = \"$MONIKER\"/" $STABLED_DIR/config/config.toml
-rm rpc_node_config.zip config.toml app.toml
-
-# Essential configuration updates
+# Essential configuration updates (applied every time to ensure proper settings)
 echo "[~] Updating configuration files..." >&2
 
 # Enable JSON-RPC in app.toml
