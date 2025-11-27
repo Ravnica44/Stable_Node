@@ -9,10 +9,10 @@ echo ""
 # Infinite loop to monitor synchronization
 while true; do
     # Get synchronization information
-    sync_info=$(cd /root/stable-node && docker compose exec stable-node curl -s localhost:26657/status 2>/dev/null | jq '.result.sync_info' 2>/dev/null)
+    sync_info=$(cd /root/Stable_Node && docker compose exec stable-node curl -s localhost:26657/status 2>/dev/null | jq '.result.sync_info' 2>/dev/null)
     
     # Get peer information
-    peer_info=$(cd /root/stable-node && docker compose exec stable-node curl -s localhost:26657/net_info 2>/dev/null | jq '.result' 2>/dev/null)
+    peer_info=$(cd /root/Stable_Node && docker compose exec stable-node curl -s localhost:26657/net_info 2>/dev/null | jq '.result' 2>/dev/null)
     
     if [ -n "$sync_info" ] && [ -n "$peer_info" ]; then
         # Extract relevant information

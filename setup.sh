@@ -103,7 +103,7 @@ export MONIKER="docker-node"
 export CHAIN_ID="stabletestnet_2201-1"
 
 # Define STABLED_DIR path inside stable-node directory
-STABLED_DIR="/root/stable-node/stabled"
+STABLED_DIR="/root/Stable_Node/stabled"
 
 # Check if config directory exists
 if [ ! -d "$STABLED_DIR/config" ]; then
@@ -157,13 +157,13 @@ chown -R 1000:1000 $STABLED_DIR
 chmod -R 755 $STABLED_DIR
 
 # Download and extract snapshot if snapshot file doesn't exist in project directory
-if [ ! -f "/root/stable-node/snapshot.tar.lz4" ]; then
+if [ ! -f "/root/Stable_Node/snapshot.tar.lz4" ]; then
     echo "[~] Downloading snapshot..." >&2
-    cd /root/stable-node
+    cd /root/Stable_Node
     wget -c https://stable-snapshot.s3.eu-central-1.amazonaws.com/snapshot.tar.lz4 >/dev/null 2>&1
 else
     echo "[~] Using existing snapshot file..." >&2
-    cd /root/stable-node
+    cd /root/Stable_Node
 fi
 
 # Remove old data
